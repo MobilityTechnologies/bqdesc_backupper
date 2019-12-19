@@ -5,13 +5,12 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 
-from config import Config
 from dataset_desc import DatasetDesc
 from table_desc import TableDesc
 
 
 class Firestore(object):
-    def __init__(self, config: Config, logger):
+    def __init__(self, config, logger):
         self.logger = logger
         self.project = config.gcp_project
         self.table_desc_col = config.firestore_table_desc_collection_name

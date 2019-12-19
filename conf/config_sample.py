@@ -29,10 +29,11 @@ class Config(object):
     #-----------------------
 
     # Collection to store dataset descriptions
-    firesotre_dataset_desc_collection_name = 'bqdesc-backuper-dataset-desc'
+    firesotre_dataset_desc_collection_name = 'bqdesc-backupper-dataset-desc'
 
     # Collection to store table descriptions
-    firestore_table_desc_collection_name = 'bqdesc-backuper-table-desc'
+    firestore_table_desc_collection_name = 'bqdesc-backupper-table-desc'
+    dataset_include_pattern = r'.*'
 
     #------------------------
     # Target Filter

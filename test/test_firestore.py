@@ -1,14 +1,14 @@
 import datetime
 import unittest
 
-from init import config, logger, ignore_warnings, TEST_DS
+from init import config, logger, ignore_warnings
 
 from dataset_desc import DatasetDesc
 from firestore import Firestore
 from table_desc import TableDesc
 
+TEST_DS = "test_bqdesc_buckuper"
 TEST_TABLE = "update_test"
-
 
 class TestFireStore(unittest.TestCase):
 
@@ -89,7 +89,7 @@ class TestFireStore(unittest.TestCase):
 
     @ignore_warnings
     def test_list_snapshot(self):
-        print(self.db.list_db_snapshot())
+        self.db.list_db_snapshot()
 
 
 if __name__ == '__main__':

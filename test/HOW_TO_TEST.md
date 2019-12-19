@@ -1,11 +1,26 @@
 ## How to Test
 
-make `conf/config_for_test.py`
+cd root directory
+
+```
+cd bqdesc_backupper
+```
+
+make config
+
+```
+cp conf/config_sample.py conf/config_for_test.py
+vim conf/config_for_test.py
+```
 
 make tables
 
 ```
-./make_test_dataset_and_tables.sh
+test/make_test_dataset_and_tables.sh
 ```
 
 run test
+
+```
+python -m unittest discover test "test_*.py"
+```

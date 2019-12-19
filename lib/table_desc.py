@@ -71,15 +71,9 @@ class TableDesc(object):
                 field.description = description
 
     def update_description(self, other):
-        """
-        引数のTableDescでfiled_descriptionを更新する。列が一致したもの飲みを更新する
-        :param other:
-        :return:
-        """
         self.description = other.description
         for other_field in other.field_list:
             if self.has_fields_description(other_field.name):
-                # どちらにも存在する列
                 self._update_field_description(other_field.name, other_field.description)
 
 

@@ -2,14 +2,8 @@ import logging
 import os
 import sys
 
-app_home = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "bqdesc_backuper")
-sys.path.append(app_home)
-
 import warnings
 from urllib3.exceptions import InsecureRequestWarning
-
-
-# ResourceWarning: unclosed <ssl.SSLSocketを回避するためのデコレータ
 def ignore_warnings(test_func):
     def do_test(self, *args, **kwargs):
         with warnings.catch_warnings():
@@ -21,18 +15,18 @@ def ignore_warnings(test_func):
 
     return do_test
 
-
+app_home = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+sys.path.append(os.path.join(app_home,"conf"))
 from config_for_test import Config
 config = Config
 
-# ログの設定
+sys.path.append(os.path.join(app_home,"lib"))
+
 log_format = logging.Formatter("%(asctime)s [%(levelname)8s] %(message)s")
 logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-# 標準出力へのハンドラ
+logger.setLevel(logging.WARNING)
 stdout_handler = logging.StreamHandler(sys.stdout)
 stdout_handler.setFormatter(log_format)
 logger.addHandler(stdout_handler)
 
-TEST_DS = "test_bqdesc_buckuper"
-GCP_PROJECT_ID = "jtx-dwh-dev"
+

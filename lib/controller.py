@@ -3,6 +3,10 @@ from dataset_desc import DatasetDesc
 from firestore import Firestore
 from table_desc import TableDesc
 
+class MuiltipleProcessingResult(object):
+    def __init__(self,is_success,result_dict):
+        self.is_success = is_success
+        self.result_dict = result_dict
 
 class Controller:
     def __init__(self, config, logger):
@@ -39,7 +43,7 @@ class Controller:
             self.logger.info("ok")
             return True
 
-    def backup_all(self) -> bool:
+    def backup_all(self) -> MuiltipleProcessingResult:
         self.logger.info(f'[BACKUP] Backup BigQuery all descriptions to FireStore "{self.firestore.dataset_desc_col}"')
         result_type_counter = {"ok": 0, "skip": 0, "exception": 0}
         for dataset_id in self.bigquery.list_dataset_id(
@@ -59,28 +63,33 @@ class Controller:
                 self.logger.exception(e)
                 result_type_counter["exception"] += 1
             # backup table description
-            for table_id in self.bigquery.list_table_id(
-                    dataset_id,
-                    include_pattern=self.config.table_include_pattern,
-                    exclude_pattern=self.config.table_exclude_pattern):
-                try:
-                    table_desc: TableDesc = self.bigquery.get_table_desc(dataset_id=dataset_id, table_id=table_id)
-                    if (table_desc.is_no_description()):
-                        self.logger.info(f"[BACKUP] [T] [skip] [{dataset_id}.{table_id}] table has no description.")
-                        result_type_counter["skip"] += 1
-                    else:
-                        self.firestore.put_table_desc(dataset_id=dataset_id, table_id=table_id, table_desc=table_desc)
-                        self.logger.info(f"[BACKUP] [T] [ok] [{dataset_id}.{table_id}]")
-                        result_type_counter["ok"] += 1
-                except Exception as e:
-                    self.logger.exception(e)
-                    result_type_counter["exception"] += 1
+            try:
+                for table_id in self.bigquery.list_table_id(
+                        dataset_id,
+                        include_pattern=self.config.table_include_pattern,
+                        exclude_pattern=self.config.table_exclude_pattern):
+                    try:
+                        table_desc: TableDesc = self.bigquery.get_table_desc(dataset_id=dataset_id, table_id=table_id)
+                        if (table_desc.is_no_description()):
+                            self.logger.info(f"[BACKUP] [T] [skip] [{dataset_id}.{table_id}] table has no description.")
+                            result_type_counter["skip"] += 1
+                        else:
+                            self.firestore.put_table_desc(dataset_id=dataset_id, table_id=table_id, table_desc=table_desc)
+                            self.logger.info(f"[BACKUP] [T] [ok] [{dataset_id}.{table_id}]")
+                            result_type_counter["ok"] += 1
+                    except Exception as e:
+                        self.logger.exception(e)
+                        result_type_counter["exception"] += 1
+            except Exception as e:
+                # In case of list error
+                self.logger.exception(e)
+                result_type_counter["exception"] += 1
         if result_type_counter["exception"] > 0:
             self.logger.error(f"[BACKUP] Finish with some errors. result={result_type_counter}")
-            return False
+            return MuiltipleProcessingResult(is_success=False,result_dict=result_type_counter)
         else:
             self.logger.info(f"[BACKUP] Finish with no error.  result={result_type_counter}")
-            return True
+            return MuiltipleProcessingResult(is_success=True,result_dict=result_type_counter)
 
     # -----------------------------------------
     # RESTORE
@@ -102,7 +111,7 @@ class Controller:
         self.logger.info(f"{bq_update_result.type.value}. {bq_update_result.detail}")
         return bq_update_result
 
-    def restore_all(self) -> dict:
+    def restore_all(self) -> MuiltipleProcessingResult:
         self.logger.info(
             f"[RESTORE] Restore FireStore ({self.firestore.table_desc_col}) to BigQuery Table and FireStore ({self.firestore.dataset_desc_col}) to BigQuery Datasets")
         result_type_counter = {"exception": 0}
@@ -141,6 +150,7 @@ class Controller:
                 error_count += 1
         if error_count > 0:
             self.logger.error(f"[RESTORE] Finish with some errors. Result = {result_type_counter}")
+            return MuiltipleProcessingResult(is_success=False,result_dict=result_type_counter)
         else:
             self.logger.info(f"[RESTORE] Finish with no error. Result = {result_type_counter}")
-        return result_type_counter
+            return MuiltipleProcessingResult(is_success=True,result_dict=result_type_counter)

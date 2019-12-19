@@ -14,7 +14,7 @@ from config import Config
 config = Config()
 
 # load library
-from controller import Controller
+from controller import Controller, MuiltipleProcessingResult
 from firestore import Firestore
 from bigquery import BqUpdateResult
 
@@ -76,8 +76,9 @@ def dataset(dataset):
 
 @backup.command(help="Backup all dataset and table(fields) descriptions in project")
 def all():
-    is_ok = controller.backup_all()
-    if not is_ok: sys.exit(1)
+    result:MuiltipleProcessingResult = controller.backup_all()
+    if not result.is_success:
+        sys.exit(1)
 
 
 @restore.command(help="Restore specified table and fields description")
@@ -97,8 +98,8 @@ def dataset(dataset):
 
 @restore.command(help="Restore all dataset and table(fields) description")
 def all():
-    is_ok = controller.restore_all()
-    if not is_ok: sys.exit(1)
+    result:MuiltipleProcessingResult = controller.restore_all()
+    if not result.is_success: sys.exit(1)
 
 
 @snapshot.command(help="Make FireStore collection snapshot")

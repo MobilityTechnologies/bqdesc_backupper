@@ -4,7 +4,6 @@ from enum import Enum
 import os
 import re
 
-from config import Config
 from table_desc import TableDesc
 from dataset_desc import DatasetDesc
 
@@ -27,7 +26,7 @@ class BqUpdateResult(object):
 
 class Bigquery:
 
-    def __init__(self,config: Config,logger):
+    def __init__(self,config,logger):
         self.logger = logger
         self.project = config.gcp_project
         os.environ["GOOGLE_CLOUD_PROJECT"] = self.project

@@ -1,7 +1,7 @@
 import datetime
 import unittest
 
-from init import config, logger, ignore_warnings, TEST_DS
+from init import config, logger, ignore_warnings
 
 from bigquery import Bigquery
 from controller import Controller
@@ -9,11 +9,10 @@ from dataset_desc import DatasetDesc
 from firestore import Firestore
 from table_desc import TableDesc
 
+TEST_DS = "test_bqdesc_buckuper"
 TEST_TABLE = "update_test"
 TEST_COL1 = "col1"
 TEST_COL2 = "col2"
-JST = datetime.timezone(datetime.timedelta(hours=+9), 'JST')
-
 
 class TestController(unittest.TestCase):
     def setUp(self):

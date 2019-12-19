@@ -1,17 +1,19 @@
-# BigQuery Description Backuper
+# BigQuery Description Backupper
 
 ## What is this?
 
 - Backup descriptions of Google BigQuery dataset, table and field to Google FireStore.
 - Restore descriptions from FireStore to BigQuery
 
+This tool can run on Python3.6+
+
 ## How to Use
 
 #### 1.Install
 
 ```
-git clone https://github.com/JapanTaxi/bqdesc_backuper.git
-cd bqdesc_backuper
+git clone https://github.com/JapanTaxi/bqdesc_backupper.git
+cd bqdesc_backupper
 pip install -r requirements.txt
 ```
 
@@ -20,7 +22,7 @@ pip install -r requirements.txt
 copy sample
 
 ```
-copy conf/config_sample.py conf/config.py
+cp conf/config_sample.py conf/config.py
 ```
 
 edit config
@@ -76,8 +78,8 @@ python bin/main.py restore dataset -d myds
 
 ### FireStore Snapshot
 
-For when you accidentally delete some description, this tool provide function of FireStore snapshot.
-By taking snapshot regularly, you can recover data which time you want.
+For accidentally deletion, this tool provide function of FireStore snapshot.
+By taking snapshot regularly, you can recover data from snapshot you want.
 
 
 ```
@@ -96,8 +98,8 @@ python bin/main.py snapshot make
 
 ```
 2019-12-19 19:52:39,173 [    INFO] Make FileStore snapshot collection
-2019-12-19 19:52:39,173 [    INFO] copy bqdesc-backuper-table-desc -> bqdesc-backuper-table-desc-20191219
-2019-12-19 19:52:44,053 [    INFO] copy bqdesc-backuper-dataset-desc -> bqdesc-backuper-dataset-desc-20191219
+2019-12-19 19:52:39,173 [    INFO] copy bqdesc-backupper-table-desc -> bqdesc-backupper-table-desc-20191219
+2019-12-19 19:52:44,053 [    INFO] copy bqdesc-backupper-dataset-desc -> bqdesc-backupper-dataset-desc-20191219
 ```
 
 

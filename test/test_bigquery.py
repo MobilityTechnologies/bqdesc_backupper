@@ -1,16 +1,17 @@
 import datetime
 import unittest
 
-from init import config, logger, ignore_warnings, GCP_PROJECT_ID, TEST_DS
+from init import config, logger, ignore_warnings
 
 from bigquery import Bigquery, ResultType
 from dataset_desc import DatasetDesc
 from table_desc import TableDesc
 
+GCP_PROJECT_ID = config.gcp_project
+TEST_DS = "test_bqdesc_buckuper"
 TEST_TABLE = "update_test"
 TEST_COL1 = "col1"
 TEST_COL2 = "col2"
-
 
 class TestBigquery(unittest.TestCase):
     def setUp(self):
@@ -175,7 +176,6 @@ class TestBigquery(unittest.TestCase):
         self.assertEqual('new table description' + rand, ret_table_desc.description)
         self.assertEqual('new col1 description' + rand, ret_table_desc.field_list[0].description)
         self.assertEqual('new col2 description' + rand, ret_table_desc.field_list[1].description)
-        print(bq_update_result.detail)
 
     @ignore_warnings
     def test_update_table_desc__same(self):

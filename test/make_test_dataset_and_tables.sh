@@ -1,5 +1,3 @@
-export PATH=/Users/nzk190130g/.pyenv/versions/2.7.15/bin:$PATH
-
 bq mk --project_id ${GOOGLE_CLOUD_PROJECT}  ${TEST_DATASET}
 
 #----------------------------------------------------
