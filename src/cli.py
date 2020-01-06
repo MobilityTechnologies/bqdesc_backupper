@@ -4,21 +4,19 @@ import sys
 
 import click
 
-app_home = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+app_home = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(os.path.join(app_home, "lib"))
 sys.path.append(os.path.join(app_home, "conf"))
 
 # load config
-from config import Config
+from conf.config import Config
 
 config = Config()
 
 # load library
-from controller import Controller, MuiltipleProcessingResult
-from firestore import Firestore
-from bigquery import BqUpdateResult
-
-RESPONSE_HEADERS = {'Access-Control-Allow-Origin': '*'}
+from lib.controller import Controller
+from lib.firestore import Firestore
+from lib.slack import Slack
 
 # Logger setting
 log_format = logging.Formatter("%(asctime)s [%(levelname)8s] %(message)s")
@@ -33,27 +31,28 @@ logger.addHandler(stdout_handler)
 
 controller = Controller(config, logger)
 firestore = Firestore(config, logger)
+slack = Slack(config, logger)
 
 
 @click.group(help='BigQuery Description Backuper')
 @click.pass_context
-def main(ctx):
+def cli_main(ctx):
     pass
 
 
-@main.group(help='Backup BigQuery Description to FireStore')
+@cli_main.group(help='Backup BigQuery Description to FireStore')
 @click.pass_context
 def backup(ctx):
     pass
 
 
-@main.group(help='Restore from FireStore to BigQuery')
+@cli_main.group(help='Restore from FireStore to BigQuery')
 @click.pass_context
 def restore(ctx):
     pass
 
 
-@main.group(help='FireStore Data Snapshot')
+@cli_main.group(help='FireStore Data Snapshot')
 @click.pass_context
 def snapshot(ctx):
     pass
@@ -63,43 +62,36 @@ def snapshot(ctx):
 @click.option('--dataset', '-d', required=True)
 @click.option('--table', '-t', required=True)
 def table(table, dataset):
-    is_ok = controller.backup_table(table_id=table, dataset_id=dataset)
-    if not is_ok: sys.exit(1)
+    controller.backup_table(table_id=table, dataset_id=dataset)
 
 
 @backup.command(help="Backup specified dataset description")
 @click.option('--dataset', '-d', required=True)
 def dataset(dataset):
-    is_ok = controller.backup_dataset(dataset_id=dataset)
-    if not is_ok: sys.exit(1)
+    controller.backup_dataset(dataset_id=dataset)
 
 
 @backup.command(help="Backup all dataset and table(fields) descriptions in project")
 def all():
-    result:MuiltipleProcessingResult = controller.backup_all()
-    if not result.is_success:
-        sys.exit(1)
+    controller.backup_all()
 
 
 @restore.command(help="Restore specified table and fields description")
 @click.option('--dataset', '-d', required=True)
 @click.option('--table', '-t', required=True)
 def table(table, dataset):
-    bq_update_result: BqUpdateResult = controller.restore_table(table_id=table, dataset_id=dataset)
-    if not bq_update_result.is_success:  sys.exit(1)
+    controller.restore_table(table_id=table, dataset_id=dataset)
 
 
 @restore.command(help="Restore specified dataset description")
 @click.option('--dataset', '-d', required=True)
 def dataset(dataset):
-    bq_update_result: BqUpdateResult = controller.restore_dataset(dataset_id=dataset)
-    if not bq_update_result.is_success:  sys.exit(1)
+    controller.restore_dataset(dataset_id=dataset)
 
 
 @restore.command(help="Restore all dataset and table(fields) description")
 def all():
-    result:MuiltipleProcessingResult = controller.restore_all()
-    if not result.is_success: sys.exit(1)
+    controller.restore_all()
 
 
 @snapshot.command(help="Make FireStore collection snapshot")
@@ -129,4 +121,13 @@ def recover_dataset(dataset, snapshot_id):
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        cli_main()
+    except Exception as e:
+        logger.exception(e)
+        if config.enable_slack_notify:
+            import traceback
+
+            except_str = traceback.format_exc()
+            slack.post_error("bqdesc_backupper Error\n" + except_str)
+        sys.exit(1)

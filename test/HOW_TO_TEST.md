@@ -9,8 +9,8 @@ cd bqdesc_backupper
 make config
 
 ```
-cp conf/config_sample.py conf/config_for_test.py
-vim conf/config_for_test.py
+cp src/conf/config_sample.py src/conf/config_for_test.py
+vim src/conf/config_for_test.py
 ```
 
 make tables

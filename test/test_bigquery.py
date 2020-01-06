@@ -3,9 +3,9 @@ import unittest
 
 from init import config, logger, ignore_warnings
 
-from bigquery import Bigquery, ResultType
-from dataset_desc import DatasetDesc
-from table_desc import TableDesc
+from lib.bigquery import Bigquery, ResultType
+from lib.dataset_desc import DatasetDesc
+from lib.table_desc import TableDesc
 
 GCP_PROJECT_ID = config.gcp_project
 TEST_DS = "test_bqdesc_buckuper"

@@ -5,8 +5,8 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 
-from dataset_desc import DatasetDesc
-from table_desc import TableDesc
+from lib.dataset_desc import DatasetDesc
+from lib.table_desc import TableDesc
 
 
 class Firestore(object):

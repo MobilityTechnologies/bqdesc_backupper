@@ -3,11 +3,11 @@ import unittest
 
 from init import config, logger, ignore_warnings
 
-from bigquery import Bigquery
-from controller import Controller
-from dataset_desc import DatasetDesc
-from firestore import Firestore
-from table_desc import TableDesc
+from lib.bigquery import Bigquery
+from lib.controller import Controller
+from lib.dataset_desc import DatasetDesc
+from lib.firestore import Firestore
+from lib.table_desc import TableDesc
 
 TEST_DS = "test_bqdesc_buckuper"
 TEST_TABLE = "update_test"
@@ -61,7 +61,7 @@ class TestController(unittest.TestCase):
         # Update DB
         self.firestore.put_table_desc(dataset_id=TEST_DS, table_id=TEST_TABLE, table_desc=table_desc)
         # restore
-        self.controller.restore_table(dataset_id=TEST_DS, table_id=TEST_TABLE)
+        self.controller._restore_table(dataset_id=TEST_DS, table_id=TEST_TABLE)
         # check BD
         table_desc = self.bq.get_table_desc(dataset_id=TEST_DS, table_id=TEST_TABLE)
         self.assertEqual(ymd_desc, table_desc.description)
@@ -87,7 +87,7 @@ class TestController(unittest.TestCase):
         # update DB
         self.firestore.put_dataset_desc(dataset_id=TEST_DS, dataset_desc=dataset_desc)
         # restore
-        self.controller.restore_dataset(dataset_id=TEST_DS)
+        self.controller._restore_dataset(dataset_id=TEST_DS)
         # check BQ
         dataset_desc = self.bq.get_dataset_desc(dataset_id=TEST_DS)
         self.assertEqual(ymd_desc, dataset_desc.description)

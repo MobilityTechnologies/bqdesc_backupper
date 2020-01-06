@@ -1,4 +1,4 @@
 __pycache__
-conf/config.py
-conf/config_for_test.py
+src/conf/config.py
+src/conf/config_for_test.py
 .idea
