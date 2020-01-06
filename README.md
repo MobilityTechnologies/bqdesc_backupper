@@ -22,13 +22,13 @@ pip install -r requirements.txt
 copy sample
 
 ```
-cp conf/config_sample.py conf/config.py
+cp src/conf/config_sample.py src/conf/config.py
 ```
 
 edit config
 
 ```
-vim conf/config.py
+vim src/conf/config.py
 ```
 
 #### 3.Run
@@ -36,13 +36,13 @@ vim conf/config.py
 backup all datasets and tables(fields) description in project to FireStore
 
 ```
-python bin/main.py backup all
+python src/cli.py backup all
 ```
 
 restore all
 
 ```
-python bin/main.py restore all
+python src/cli.py restore all
 ```
 
 
@@ -53,13 +53,13 @@ python bin/main.py restore all
 backup table and fields description
 
 ```
-python bin/main.py backup table -d myds -t mytable
+python src/cli.py backup table -d myds -t mytable
 ```
 
 restore 
 
 ```
-python bin/main.py restore table -d myds -t mytable
+python src/cli.py restore table -d myds -t mytable
 ```
 
 ### Specify Dataset
@@ -67,13 +67,13 @@ python bin/main.py restore table -d myds -t mytable
 backup dataset description 
 
 ```
-python bin/main.py backup dataset -d myds
+python src/cli.py backup dataset -d myds
 ```
 
 restore 
 
 ```
-python bin/main.py restore dataset -d myds
+python src/cli.py restore dataset -d myds
 ```
 
 ### FireStore Snapshot
@@ -93,7 +93,7 @@ BigQuery  -> FireStore(prod-db)  -> FireStore(prod-db-20191219)
 #### take snapshot
 
 ```
-python bin/main.py snapshot make
+python src/cli.py snapshot make
 ```
 
 ```
@@ -108,18 +108,23 @@ python bin/main.py snapshot make
 recover table data
 
 ```
-python bin/main.py snapshot recover-table -d myds -t mytable -s 20191219
+python src/cli.py snapshot recover-table -d myds -t mytable -s 20191219
 ```
 
 recover dataset data
 
 ```
-python bin/main.py snapshot recover-dataset -d myds -s 20191219
+python src/cli.py snapshot recover-dataset -d myds -s 20191219
 ```
 
 
 #### list snapshot
 
 ```
-python bin/main.py snapshot list
+python src/cli.py snapshot list
 ```
+
+## Other Functions
+
+* [Integration with Slack](doc/SLACK.md)
+* [Integration with Google Cloud Functions](doc/CLOUD_FUNCTIONS.md)

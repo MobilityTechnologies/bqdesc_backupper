@@ -15,12 +15,10 @@ def ignore_warnings(test_func):
 
     return do_test
 
-app_home = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
-sys.path.append(os.path.join(app_home,"conf"))
-from config_for_test import Config
+app_home = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src")
+sys.path.append(os.path.join(app_home))
+from conf.config_for_test import Config
 config = Config
-
-sys.path.append(os.path.join(app_home,"lib"))
 
 log_format = logging.Formatter("%(asctime)s [%(levelname)8s] %(message)s")
 logger = logging.getLogger()

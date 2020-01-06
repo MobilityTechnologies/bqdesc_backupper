@@ -4,8 +4,8 @@ from enum import Enum
 import os
 import re
 
-from table_desc import TableDesc
-from dataset_desc import DatasetDesc
+from lib.table_desc import TableDesc
+from lib.dataset_desc import DatasetDesc
 
 MATCH_ALL = r'.*'
 MATCH_NONE = r'^$'

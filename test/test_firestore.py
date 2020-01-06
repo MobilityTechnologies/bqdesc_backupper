@@ -3,9 +3,9 @@ import unittest
 
 from init import config, logger, ignore_warnings
 
-from dataset_desc import DatasetDesc
-from firestore import Firestore
-from table_desc import TableDesc
+from lib.dataset_desc import DatasetDesc
+from lib.firestore import Firestore
+from lib.table_desc import TableDesc
 
 TEST_DS = "test_bqdesc_buckuper"
 TEST_TABLE = "update_test"
@@ -26,7 +26,6 @@ class TestFireStore(unittest.TestCase):
         table_desc = TableDesc(in_dict=table_dict)
         self.db.put_table_desc(TEST_DS, TEST_TABLE, table_desc)
         ret = self.db.get_table_desc(TEST_DS, TEST_TABLE)
-        self.assertIsInstance(ret, TableDesc)
         self.assertEqual(rand_desc, ret.field_list[0].description)
 
     @ignore_warnings
@@ -36,7 +35,6 @@ class TestFireStore(unittest.TestCase):
             in_dict={'description': rand_desc, 'datasetReference': {'projectId': 'a', 'datasetId': TEST_DS}})
         self.db.put_dataset_desc(TEST_DS, dataset_desc)
         ret = self.db.get_dataset_desc(TEST_DS)
-        self.assertIsInstance(ret, DatasetDesc)
         self.assertEqual(rand_desc, ret.description)
 
     @ignore_warnings

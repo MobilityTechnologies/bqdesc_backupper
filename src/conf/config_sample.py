@@ -33,7 +33,6 @@ class Config(object):
 
     # Collection to store table descriptions
     firestore_table_desc_collection_name = 'bqdesc-backupper-table-desc'
-    dataset_include_pattern = r'.*'
 
     #------------------------
     # Target Filter
@@ -45,7 +44,7 @@ class Config(object):
     #dataset_include_pattern = r'^(dwh_|raw_)'
     dataset_include_pattern = r'.*'
 
-    # If dataset_id match this regexp, is is skiped.
+    # If dataset_id match this regexp, it is skiped.
     #   Default r'^$'    (= match nothing)
     #
     dataset_exclude_pattern = r'^$'
@@ -60,3 +59,15 @@ class Config(object):
     #
     table_exclude_pattern = r'^$'
 
+
+    #------------------------
+    # Slack Integration
+    #------------------------
+
+    # If True, send error messages to Slack channel.
+    #
+    enable_slack_notify = False
+
+    # Slack Incomming Webhook URL
+    #   see https://slack.com/help/articles/115005265063
+    slack_incomming_webhook_url = "https://hooks.slack.com/services/xxxxx"
