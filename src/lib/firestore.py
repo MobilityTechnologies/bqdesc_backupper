@@ -45,9 +45,19 @@ class Firestore(object):
             raise Exception(
                 f"Does not exist. collection = {self.dataset_desc_col} document_id = {dataset_id}.{table_id}")
 
-    def get_all_table_desc_list(self) -> [TableDesc]:
-        doc_ref = self.firestore_client.collection(self.table_desc_col)
+    def get_all_table_desc_list(self, snapshot=None) -> [TableDesc]:
+        if snapshot == None:
+            doc_ref = self.firestore_client.collection(self.table_desc_col)
+        else:
+            doc_ref = self.firestore_client.collection(self.table_desc_col + "-" + snapshot)
         return [TableDesc(in_dict=u.to_dict()) for u in doc_ref.get()]
+
+    def get_all_table_id_and_dict_tuple_list(self, snapshot=None) -> [tuple]:
+        if snapshot == None:
+            doc_ref = self.firestore_client.collection(self.table_desc_col)
+        else:
+            doc_ref = self.firestore_client.collection(self.table_desc_col + "-" + snapshot)
+        return [(u.id, u.to_dict()) for u in doc_ref.get()]
 
     # ------------------
     # Dataset
@@ -70,6 +80,13 @@ class Firestore(object):
     def get_all_dataset_desc_list(self) -> [DatasetDesc]:
         doc_ref = self.firestore_client.collection(self.dataset_desc_col)
         return [DatasetDesc(in_dict=u.to_dict()) for u in doc_ref.get()]
+
+    def get_all_dataset_id_and_dict_tuple_list(self, snapshot=None) -> [tuple]:
+        if snapshot == None:
+            doc_ref = self.firestore_client.collection(self.dataset_desc_col)
+        else:
+            doc_ref = self.firestore_client.collection(self.dataset_desc_col + "-" + snapshot)
+        return [(u.id, u.to_dict()) for u in doc_ref.get()]
 
     # ------------------
     # DB SnapShot
@@ -129,3 +146,53 @@ class Firestore(object):
         dst_col = self.dataset_desc_col
         self.logger.info(f"copy {src_col}:{dataset_id} -> {dst_col}:{dataset_id} ")
         self._copy_doc(src_col=src_col, dst_col=dst_col, document_id=f"{dataset_id}")
+
+    # ------------------------------
+    # Data Check
+    # ------------------------------
+
+    def _is_valid_table_document(self, dic, is_raise=False):
+        try:
+            if not (len(dic.keys()) == 4):
+                return False
+            key_ok = True
+            for expect_key in ['created_at', 'description', 'schema', 'tableReference']:
+                if not expect_key in dic:
+                    key_ok = False
+
+            for expect_key_2 in ['datasetId', 'tableId', 'projectId']:
+                if not expect_key_2 in dic["tableReference"]:
+                    key_ok = False
+            from lib.table_desc import TableDesc
+            TableDesc(in_dict=dic)
+            return key_ok
+        except Exception as e:
+            if is_raise:
+                raise (e)
+            else:
+                return False
+
+    def firestore_data_check(self):
+        for snapshot in sorted(self.list_db_snapshot()):
+            for id, dic in self.get_all_table_id_and_dict_tuple_list(snapshot):
+                self._is_valid_table_document(dic, is_raise=True)
+
+    # ------------------------------
+    # Maintain
+    # ------------------------------
+
+    def print_table_description_stats(self):
+        for snapshot in sorted(self.list_db_snapshot()):
+            for id, dic in self.get_all_table_id_and_dict_tuple_list(snapshot):
+                disc_num = 0
+                for f in dic["schema"]["fields"]:
+                    if f["description"] != "":
+                        disc_num += 1
+                col_num = len(dic["schema"]["fields"])
+                print(f'{id},{snapshot},{disc_num},{col_num}')
+
+    def delete_table_on_snapshot(self, snapshot, dataset_id, table_id):
+        from google.cloud.firestore_v1.document import DocumentReference
+        doc_ref: DocumentReference = self.firestore_client.collection(self.table_desc_col + "-" + snapshot).document(
+            f"{dataset_id}.{table_id}")
+        doc_ref.delete()
