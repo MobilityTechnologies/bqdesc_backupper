@@ -73,6 +73,14 @@ class Bigquery:
             else:
                 is_success = False
             return BqUpdateResult(is_success,ResultType.DATASET_NOT_FOUND)
+        except BadRequest as e:
+            if e.errors[0]["message"].find("Invalid dataset ID") > -1:
+                if self.config.ignore_dataset_not_found_error_when_restore:
+                    is_success = True
+                else:
+                    is_success = False
+                return BqUpdateResult(is_success,ResultType.DATASET_NOT_FOUND,detail=str(e))
+            raise e
 
     def list_dataset_id(self, include_pattern=MATCH_ALL, exclude_pattern=MATCH_NONE):
         ret = []
@@ -105,7 +113,11 @@ class Bigquery:
             return BqUpdateResult(is_success,ResultType.TABLE_NOT_FOUND,detail=str(e))
         except BadRequest as e:
             if e.errors[0]["message"].find("Invalid table ID") > -1:
-                return BqUpdateResult(False,ResultType.TABLE_NOT_FOUND,detail=str(e))
+                if self.config.ignore_table_not_found_error_when_restore:
+                    is_success = True
+                else:
+                    is_success = False
+                return BqUpdateResult(is_success,ResultType.TABLE_NOT_FOUND,detail=str(e))
             raise e
         is_same, diff_msg = new_table_desc.check_diff(now_table_desc)
         if is_same:
