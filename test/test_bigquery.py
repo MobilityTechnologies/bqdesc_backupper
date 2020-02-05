@@ -266,6 +266,25 @@ class TestBigquery(unittest.TestCase):
         table_desc = TableDesc(in_dict=new_table_dict)
         bq_update_result = self.bq.update_table_desc(table_desc)
         self.assertEqual(ResultType.TABLE_NOT_FOUND, bq_update_result.type)
+        self.assertEqual(False,bq_update_result.is_success)
+
+    @ignore_warnings
+    def test_update_table_not_exist_dataset_with_ignore_table_not_found_error_when_restore(self):
+        org_value = config.ignore_table_not_found_error_when_restore
+        try:
+            config.ignore_table_not_found_error_when_restore = True
+            tmp_bq = Bigquery(config, logger)
+
+            new_table_dict = {'schema': {'fields': []},
+                          'tableReference': {"projectId": GCP_PROJECT_ID, "datasetId": TEST_DS,
+                                             "tableId": "does not exist table"}
+                          }
+            table_desc = TableDesc(in_dict=new_table_dict)
+            bq_update_result = tmp_bq.update_table_desc(table_desc)
+            self.assertEqual(ResultType.TABLE_NOT_FOUND, bq_update_result.type)
+            self.assertEqual(True,bq_update_result.is_success)
+        finally:
+            config.ignore_table_not_found_error_when_restore = org_value
 
     @ignore_warnings
     def test_list_table_id(self):
@@ -298,9 +317,40 @@ class TestBigquery(unittest.TestCase):
     def test_update_dataset_desc_twice(self):
         ymd_str = "{0}".format(datetime.datetime.now())
         dataset_desc = DatasetDesc(in_dict={"description": ymd_str, "datasetReference": self.dataset_reference})
-        msg = self.bq.update_dataset_desc(dataset_desc)
+        tmp_update_result = self.bq.update_dataset_desc(dataset_desc)
         update_result = self.bq.update_dataset_desc(dataset_desc)
         self.assertEqual(ResultType.SAME, update_result.type)
+
+
+    @ignore_warnings
+    def test_update_dataset_not_exist_dataset(self):
+        ymd_str = "{0}".format(datetime.datetime.now())
+        dataset_reference = {
+            "projectId": GCP_PROJECT_ID,
+            "datasetId": "does not exist dataset"
+        }
+        dataset_desc = DatasetDesc(in_dict={"description": ymd_str, "datasetReference": dataset_reference})
+        bq_update_result = self.bq.update_dataset_desc(dataset_desc)
+        self.assertEqual(ResultType.DATASET_NOT_FOUND, bq_update_result.type)
+        self.assertEqual(False,bq_update_result.is_success)
+
+    @ignore_warnings
+    def test_update_dataset_not_exist_dataset_with_ignore_dataset_not_found_error_when_restore(self):
+        org_value = config.ignore_dataset_not_found_error_when_restore
+        try:
+            config.ignore_dataset_not_found_error_when_restore = True
+            ymd_str = "{0}".format(datetime.datetime.now())
+            dataset_reference = {
+                "projectId": GCP_PROJECT_ID,
+                "datasetId": "does not exist dataset"
+            }
+            dataset_desc = DatasetDesc(in_dict={"description": ymd_str, "datasetReference": dataset_reference})
+            bq_update_result = self.bq.update_dataset_desc(dataset_desc)
+            self.assertEqual(ResultType.DATASET_NOT_FOUND, bq_update_result.type)
+            self.assertEqual(True,bq_update_result.is_success)
+        finally:
+            config.ignore_dataset_not_found_error_when_restore = org_value
+
 
     # ----------------------------
     # Project
