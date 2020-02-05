@@ -71,3 +71,14 @@ class Config(object):
     # Slack Incomming Webhook URL
     #   see https://slack.com/help/articles/115005265063
     slack_incomming_webhook_url = "https://hooks.slack.com/services/xxxxx"
+
+
+    #------------------------
+    # Costomize Error
+    #------------------------
+
+    # If True, Ignore error of DatasetNotFound when restore
+    ignore_dataset_not_found_error_when_restore = False
+
+    # If True, Ignore error of TableNotFound when restore
+    ignore_table_not_found_error_when_restore = False
