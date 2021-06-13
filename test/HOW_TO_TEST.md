@@ -22,5 +22,11 @@ test/make_test_dataset_and_tables.sh
 run test
 
 ```
-python -m unittest discover test "test_*.py"
+python test/test_controller.py  # need to specify test file
+```
+
+or
+
+```
+pytest test
 ```
