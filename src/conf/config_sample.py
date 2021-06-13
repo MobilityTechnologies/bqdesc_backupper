@@ -8,6 +8,10 @@ class Config(object):
     #   valid choice : "info", "warn", "error", "debug"
     loglevel = "info"
 
+    # Storage Target
+    #   valid choice : "localfile", "firestore"
+    storage_target = "localfile"
+
     #----------------------
     # BigQuery
     #----------------------
@@ -33,6 +37,13 @@ class Config(object):
 
     # Collection to store table descriptions
     firestore_table_desc_collection_name = 'bqdesc-backupper-table-desc'
+
+    #-----------------------
+    # LocalFile
+    #-----------------------
+
+    # Target directory to store files of descriptions
+    localfile_dir = './'
 
     #------------------------
     # Target Filter

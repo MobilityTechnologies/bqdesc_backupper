@@ -26,5 +26,3 @@ logger.setLevel(logging.WARNING)
 stdout_handler = logging.StreamHandler(sys.stdout)
 stdout_handler.setFormatter(log_format)
 logger.addHandler(stdout_handler)
-
-

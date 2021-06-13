@@ -1,3 +1,6 @@
+#! /bin/bash
+set -eu
+
 bq mk --project_id ${GOOGLE_CLOUD_PROJECT}  ${TEST_DATASET}
 
 #----------------------------------------------------
