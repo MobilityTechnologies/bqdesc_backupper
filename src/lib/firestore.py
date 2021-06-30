@@ -20,9 +20,11 @@ class Firestore(object):
             os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = config.gcp_key_json
 
         cred = credentials.ApplicationDefault()
-        if not firebase_admin._DEFAULT_APP_NAME in firebase_admin._apps:
+        if firebase_admin._DEFAULT_APP_NAME not in firebase_admin._apps:
             # Avoid double initialize
-            firebase_admin.initialize_app(cred, {'projectId': self.project, })
+            firebase_admin.initialize_app(cred, {
+                'projectId': self.project,
+            })
         self.firestore_client = firestore.client()
 
     # ------------------
@@ -42,8 +44,7 @@ class Firestore(object):
         if doc_snp.exists:
             return TableDesc(in_dict=doc_snp.to_dict())
         else:
-            raise Exception(
-                f"Does not exist. collection = {self.dataset_desc_col} document_id = {dataset_id}.{table_id}")
+            raise Exception(f"Does not exist. collection = {self.dataset_desc_col} document_id = {dataset_id}.{table_id}")
 
     def get_all_table_desc_list(self) -> [TableDesc]:
         doc_ref = self.firestore_client.collection(self.table_desc_col)
@@ -85,17 +86,16 @@ class Firestore(object):
     def _copy_doc(self, src_col, dst_col, document_id):
         src_doc_ref = self.firestore_client.collection(src_col).document(document_id)
         src_doc = src_doc_ref.get()._data
-        if src_doc == None:
+        if src_doc is None:
             raise Exception(f"FireStore collection={src_col} document_id={document_id} is not found")
         else:
             dst_doc_ref = self.firestore_client.collection(dst_col).document(document_id)
             dst_doc_ref.set(src_doc)
 
     def make_db_snapshot(self):
-        self.logger.info(f"Make FileStore snapshot collection")
+        self.logger.info("Make FileStore snapshot collection")
         ymd = datetime.now().strftime("%Y%m%d")
-        for src_col, dst_col in [(self.table_desc_col, self.table_desc_col + "-" + ymd),
-                                 (self.dataset_desc_col, self.dataset_desc_col + "-" + ymd)]:
+        for src_col, dst_col in [(self.table_desc_col, self.table_desc_col + "-" + ymd), (self.dataset_desc_col, self.dataset_desc_col + "-" + ymd)]:
             self.logger.info(f"copy {src_col} -> {dst_col}")
             self._copy_collection(src_col=src_col, dst_col=dst_col)
         return ymd
@@ -112,8 +112,7 @@ class Firestore(object):
         """
         Copy table description in snapshot collection to production collection
         """
-        self.logger.info(
-            f"Recover table data on FireStore from snapshot. table={dataset_id}.{table_id}, snapshot_id={snap_shot_ymd}")
+        self.logger.info(f"Recover table data on FireStore from snapshot. table={dataset_id}.{table_id}, snapshot_id={snap_shot_ymd}")
         src_col = self.table_desc_col + "-" + snap_shot_ymd
         dst_col = self.table_desc_col
         self.logger.info(f"copy {src_col}:{dataset_id}.{table_id} -> {dst_col}:{dataset_id}.{table_id} ")
@@ -123,8 +122,7 @@ class Firestore(object):
         """
         Copy dataset description in snapshot collection to production collection
         """
-        self.logger.info(
-            f"Recover dataset data on FireStore from snapshot. dataset={dataset_id}, snapshot_id={snap_shot_ymd}")
+        self.logger.info(f"Recover dataset data on FireStore from snapshot. dataset={dataset_id}, snapshot_id={snap_shot_ymd}")
         src_col = self.dataset_desc_col + "-" + snap_shot_ymd
         dst_col = self.dataset_desc_col
         self.logger.info(f"copy {src_col}:{dataset_id} -> {dst_col}:{dataset_id} ")

@@ -1,11 +1,11 @@
 import datetime
 import unittest
 
-from init import config, logger, ignore_warnings
+from test.init import config, logger, ignore_warnings
 
-from lib.bigquery import Bigquery, ResultType
-from lib.dataset_desc import DatasetDesc
-from lib.table_desc import TableDesc
+from src.lib.bigquery import Bigquery, ResultType
+from src.lib.dataset_desc import DatasetDesc
+from src.lib.table_desc import TableDesc
 
 GCP_PROJECT_ID = config.gcp_project
 TEST_DS = "test_bqdesc_buckuper"
@@ -13,18 +13,12 @@ TEST_TABLE = "update_test"
 TEST_COL1 = "col1"
 TEST_COL2 = "col2"
 
+
 class TestBigquery(unittest.TestCase):
     def setUp(self):
         self.bq = Bigquery(config, logger)
-        self.table_reference = {
-            "projectId": GCP_PROJECT_ID,
-            "datasetId": TEST_DS,
-            "tableId": TEST_TABLE
-        }
-        self.dataset_reference = {
-            "projectId": GCP_PROJECT_ID,
-            "datasetId": TEST_DS
-        }
+        self.table_reference = {"projectId": GCP_PROJECT_ID, "datasetId": TEST_DS, "tableId": TEST_TABLE}
+        self.dataset_reference = {"projectId": GCP_PROJECT_ID, "datasetId": TEST_DS}
 
     # -----------------------
     # Table
@@ -81,9 +75,16 @@ class TestBigquery(unittest.TestCase):
         new_table_dict = {
             'description': 'new table description' + rand,
             'schema': {
-                'fields': [
-                    {'name': 'col1', 'type': 'STRING', 'description': 'new col1 description' + rand},
-                    {'name': 'col2', 'type': 'STRING', 'description': 'new col2 description' + rand}]},
+                'fields': [{
+                    'name': 'col1',
+                    'type': 'STRING',
+                    'description': 'new col1 description' + rand
+                }, {
+                    'name': 'col2',
+                    'type': 'STRING',
+                    'description': 'new col2 description' + rand
+                }]
+            },
             'tableReference': self.table_reference,
         }
         table_desc = TableDesc(in_dict=new_table_dict)
@@ -106,10 +107,16 @@ class TestBigquery(unittest.TestCase):
         new_table_dict = {
             'description': 'new table description' + rand,
             'schema': {
-                'fields': [
-                    {'name': 'col1', 'type': 'STRING', 'description': 'new col1 description' + rand},
-                    {'name': 'col2', 'type': 'STRING', 'description': ''}
-                ]},
+                'fields': [{
+                    'name': 'col1',
+                    'type': 'STRING',
+                    'description': 'new col1 description' + rand
+                }, {
+                    'name': 'col2',
+                    'type': 'STRING',
+                    'description': ''
+                }]
+            },
             'tableReference': self.table_reference,
         }
         table_desc = TableDesc(in_dict=new_table_dict)
@@ -133,9 +140,12 @@ class TestBigquery(unittest.TestCase):
         new_table_dict = {
             'description': 'new table description' + rand,
             'schema': {
-                'fields': [
-                    {'name': 'col1', 'type': 'STRING', 'description': 'new col1 description' + rand}
-                ]},
+                'fields': [{
+                    'name': 'col1',
+                    'type': 'STRING',
+                    'description': 'new col1 description' + rand
+                }]
+            },
             'tableReference': self.table_reference,
         }
         table_desc = TableDesc(in_dict=new_table_dict)
@@ -163,10 +173,23 @@ class TestBigquery(unittest.TestCase):
             'description': 'new table description' + rand,
             'schema': {
                 'fields': [
-                    {'name': 'col1', 'type': 'STRING', 'description': 'new col1 description' + rand},
-                    {'name': 'col2', 'type': 'STRING', 'description': 'new col2 description' + rand},
-                    {'name': 'col3', 'type': 'STRING', 'description': 'new col3 description' + rand},
-                ]},
+                    {
+                        'name': 'col1',
+                        'type': 'STRING',
+                        'description': 'new col1 description' + rand
+                    },
+                    {
+                        'name': 'col2',
+                        'type': 'STRING',
+                        'description': 'new col2 description' + rand
+                    },
+                    {
+                        'name': 'col3',
+                        'type': 'STRING',
+                        'description': 'new col3 description' + rand
+                    },
+                ]
+            },
             'tableReference': self.table_reference,
         }
         table_desc = TableDesc(in_dict=new_table_dict)
@@ -199,13 +222,22 @@ class TestBigquery(unittest.TestCase):
         """
         new_table_dict = {
             'schema': {
-                'fields': [
-                    {'name': 'col1', 'type': 'STRING'},
-                    {'name': 'col2', 'type': 'STRING'},
-                    {'name': 'col3', 'type': 'STRING'}
-                ]},
-            'tableReference': {"projectId": GCP_PROJECT_ID, "datasetId": TEST_DS,
-                               "tableId": "three_filed_descriptions"},
+                'fields': [{
+                    'name': 'col1',
+                    'type': 'STRING'
+                }, {
+                    'name': 'col2',
+                    'type': 'STRING'
+                }, {
+                    'name': 'col3',
+                    'type': 'STRING'
+                }]
+            },
+            'tableReference': {
+                "projectId": GCP_PROJECT_ID,
+                "datasetId": TEST_DS,
+                "tableId": "three_filed_descriptions"
+            },
         }
         table_desc = TableDesc(in_dict=new_table_dict)
         bq_update_result = self.bq.update_table_desc(table_desc)
@@ -221,11 +253,19 @@ class TestBigquery(unittest.TestCase):
         """
         new_table_dict = {
             'schema': {
-                'fields': [
-                    {'name': 'col1', 'type': 'STRING'},
-                    {'name': 'col2', 'type': 'STRING'}
-                ]},
-            'tableReference': {"projectId": GCP_PROJECT_ID, "datasetId": TEST_DS, "tableId": "three_filed_descriptions"}
+                'fields': [{
+                    'name': 'col1',
+                    'type': 'STRING'
+                }, {
+                    'name': 'col2',
+                    'type': 'STRING'
+                }]
+            },
+            'tableReference': {
+                "projectId": GCP_PROJECT_ID,
+                "datasetId": TEST_DS,
+                "tableId": "three_filed_descriptions"
+            }
         }
         table_desc = TableDesc(in_dict=new_table_dict)
         bq_update_result = self.bq.update_table_desc(table_desc)
@@ -239,34 +279,34 @@ class TestBigquery(unittest.TestCase):
         c2:        "b" ->  "b"
         c3:        "c"     "c"
         """
-        rand = "{0}".format(datetime.datetime.now())
-        new_table_dict = {
-            'tableReference': {"projectId": GCP_PROJECT_ID, "datasetId": TEST_DS, "tableId": "three_filed_descriptions"}
-        }
+        new_table_dict = {'tableReference': {"projectId": GCP_PROJECT_ID, "datasetId": TEST_DS, "tableId": "three_filed_descriptions"}}
         table_desc = TableDesc(in_dict=new_table_dict)
         self.bq.update_table_desc(table_desc)
 
     # 存在しない
     @ignore_warnings
     def test_update_table_not_exist_dataset(self):
-        new_table_dict = {'schema': {'fields': []},
-                          'tableReference': {"projectId": GCP_PROJECT_ID, "datasetId": "does_not_exist_dataset",
-                                             "tableId": TEST_TABLE}
-                          }
+        new_table_dict = {
+            'schema': {
+                'fields': []
+            },
+            'tableReference': {
+                "projectId": GCP_PROJECT_ID,
+                "datasetId": "does_not_exist_dataset",
+                "tableId": TEST_TABLE
+            }
+        }
         table_desc = TableDesc(in_dict=new_table_dict)
         bq_update_result = self.bq.update_table_desc(table_desc)
         self.assertEqual(ResultType.DATASET_NOT_FOUND, bq_update_result.type)
 
     @ignore_warnings
-    def test_update_table_not_exist_dataset(self):
-        new_table_dict = {'schema': {'fields': []},
-                          'tableReference': {"projectId": GCP_PROJECT_ID, "datasetId": TEST_DS,
-                                             "tableId": "does not exist table"}
-                          }
+    def test_update_table_not_exist_table(self):
+        new_table_dict = {'schema': {'fields': []}, 'tableReference': {"projectId": GCP_PROJECT_ID, "datasetId": TEST_DS, "tableId": "does not exist table"}}
         table_desc = TableDesc(in_dict=new_table_dict)
         bq_update_result = self.bq.update_table_desc(table_desc)
         self.assertEqual(ResultType.TABLE_NOT_FOUND, bq_update_result.type)
-        self.assertEqual(False,bq_update_result.is_success)
+        self.assertEqual(False, bq_update_result.is_success)
 
     @ignore_warnings
     def test_update_table_not_exist_dataset_with_ignore_table_not_found_error_when_restore(self):
@@ -275,14 +315,20 @@ class TestBigquery(unittest.TestCase):
             config.ignore_table_not_found_error_when_restore = True
             tmp_bq = Bigquery(config, logger)
 
-            new_table_dict = {'schema': {'fields': []},
-                          'tableReference': {"projectId": GCP_PROJECT_ID, "datasetId": TEST_DS,
-                                             "tableId": "does not exist table"}
-                          }
+            new_table_dict = {
+                'schema': {
+                    'fields': []
+                },
+                'tableReference': {
+                    "projectId": GCP_PROJECT_ID,
+                    "datasetId": TEST_DS,
+                    "tableId": "does not exist table"
+                }
+            }
             table_desc = TableDesc(in_dict=new_table_dict)
             bq_update_result = tmp_bq.update_table_desc(table_desc)
             self.assertEqual(ResultType.TABLE_NOT_FOUND, bq_update_result.type)
-            self.assertEqual(True,bq_update_result.is_success)
+            self.assertEqual(True, bq_update_result.is_success)
         finally:
             config.ignore_table_not_found_error_when_restore = org_value
 
@@ -317,22 +363,17 @@ class TestBigquery(unittest.TestCase):
     def test_update_dataset_desc_twice(self):
         ymd_str = "{0}".format(datetime.datetime.now())
         dataset_desc = DatasetDesc(in_dict={"description": ymd_str, "datasetReference": self.dataset_reference})
-        tmp_update_result = self.bq.update_dataset_desc(dataset_desc)
         update_result = self.bq.update_dataset_desc(dataset_desc)
         self.assertEqual(ResultType.SAME, update_result.type)
-
 
     @ignore_warnings
     def test_update_dataset_not_exist_dataset(self):
         ymd_str = "{0}".format(datetime.datetime.now())
-        dataset_reference = {
-            "projectId": GCP_PROJECT_ID,
-            "datasetId": "does not exist dataset"
-        }
+        dataset_reference = {"projectId": GCP_PROJECT_ID, "datasetId": "does not exist dataset"}
         dataset_desc = DatasetDesc(in_dict={"description": ymd_str, "datasetReference": dataset_reference})
         bq_update_result = self.bq.update_dataset_desc(dataset_desc)
         self.assertEqual(ResultType.DATASET_NOT_FOUND, bq_update_result.type)
-        self.assertEqual(False,bq_update_result.is_success)
+        self.assertEqual(False, bq_update_result.is_success)
 
     @ignore_warnings
     def test_update_dataset_not_exist_dataset_with_ignore_dataset_not_found_error_when_restore(self):
@@ -340,17 +381,13 @@ class TestBigquery(unittest.TestCase):
         try:
             config.ignore_dataset_not_found_error_when_restore = True
             ymd_str = "{0}".format(datetime.datetime.now())
-            dataset_reference = {
-                "projectId": GCP_PROJECT_ID,
-                "datasetId": "does not exist dataset"
-            }
+            dataset_reference = {"projectId": GCP_PROJECT_ID, "datasetId": "does not exist dataset"}
             dataset_desc = DatasetDesc(in_dict={"description": ymd_str, "datasetReference": dataset_reference})
             bq_update_result = self.bq.update_dataset_desc(dataset_desc)
             self.assertEqual(ResultType.DATASET_NOT_FOUND, bq_update_result.type)
-            self.assertEqual(True,bq_update_result.is_success)
+            self.assertEqual(True, bq_update_result.is_success)
         finally:
             config.ignore_dataset_not_found_error_when_restore = org_value
-
 
     # ----------------------------
     # Project

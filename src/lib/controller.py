@@ -16,8 +16,7 @@ class Controller:
     # -----------------------------------------
 
     def backup_table(self, dataset_id, table_id):
-        self.logger.info(
-            f'Backup BigQuery table "{dataset_id}.{table_id}" description to FireStore "{self.firestore.table_desc_col}:{dataset_id}.{table_id}"')
+        self.logger.info(f'Backup BigQuery table "{dataset_id}.{table_id}" description to FireStore "{self.firestore.table_desc_col}:{dataset_id}.{table_id}"')
         table_desc: TableDesc = self.bigquery.get_table_desc(dataset_id=dataset_id, table_id=table_id)
         if (table_desc.is_no_description()):
             self.logger.info("table has no description. do nothing")
@@ -26,8 +25,7 @@ class Controller:
             self.logger.info("ok")
 
     def backup_dataset(self, dataset_id):
-        self.logger.info(
-            f'Backup BigQuery dataset "{dataset_id}" description to FireStore "{self.firestore.dataset_desc_col}:{dataset_id}"')
+        self.logger.info(f'Backup BigQuery dataset "{dataset_id}" description to FireStore "{self.firestore.dataset_desc_col}:{dataset_id}"')
         dataset_desc: DatasetDesc = self.bigquery.get_dataset_desc(dataset_id=dataset_id)
         if (dataset_desc.is_no_description()):
             self.logger.info("dataset has no description. do nothing")
@@ -38,9 +36,8 @@ class Controller:
     def backup_all(self) -> str:
         self.logger.info(f'[BACKUP] Backup BigQuery all descriptions to FireStore "{self.firestore.dataset_desc_col}"')
         result_type_counter = {"ok": 0, "skip": 0, "exception": 0}
-        for dataset_id in self.bigquery.list_dataset_id(
-                include_pattern=self.config.dataset_include_pattern,
-                exclude_pattern=self.config.dataset_exclude_pattern):
+        for dataset_id in self.bigquery.list_dataset_id(include_pattern=self.config.dataset_include_pattern,
+                                                        exclude_pattern=self.config.dataset_exclude_pattern):
             # backup dataset description
             try:
                 dataset_desc: DatasetDesc = self.bigquery.get_dataset_desc(dataset_id=dataset_id)
@@ -56,18 +53,16 @@ class Controller:
                 result_type_counter["exception"] += 1
             # backup table description
             try:
-                for table_id in self.bigquery.list_table_id(
-                        dataset_id,
-                        include_pattern=self.config.table_include_pattern,
-                        exclude_pattern=self.config.table_exclude_pattern):
+                for table_id in self.bigquery.list_table_id(dataset_id,
+                                                            include_pattern=self.config.table_include_pattern,
+                                                            exclude_pattern=self.config.table_exclude_pattern):
                     try:
                         table_desc: TableDesc = self.bigquery.get_table_desc(dataset_id=dataset_id, table_id=table_id)
                         if (table_desc.is_no_description()):
                             self.logger.info(f"[BACKUP] [T] [skip] [{dataset_id}.{table_id}] table has no description.")
                             result_type_counter["skip"] += 1
                         else:
-                            self.firestore.put_table_desc(dataset_id=dataset_id, table_id=table_id,
-                                                          table_desc=table_desc)
+                            self.firestore.put_table_desc(dataset_id=dataset_id, table_id=table_id, table_desc=table_desc)
                             self.logger.info(f"[BACKUP] [T] [ok] [{dataset_id}.{table_id}]")
                             result_type_counter["ok"] += 1
                     except Exception as e:
@@ -94,8 +89,7 @@ class Controller:
             raise Exception(f"restore_table failed. type={bq_update_result.type} detail={bq_update_result.detail}")
 
     def _restore_table(self, dataset_id, table_id) -> BqUpdateResult:
-        self.logger.info(
-            f'Restore FireStore "{self.firestore.table_desc_col}:{dataset_id}.{table_id}" to BigQuery table "{dataset_id}.{table_id}"')
+        self.logger.info(f'Restore FireStore "{self.firestore.table_desc_col}:{dataset_id}.{table_id}" to BigQuery table "{dataset_id}.{table_id}"')
         table_desc: TableDesc = self.firestore.get_table_desc(dataset_id, table_id)
         bq_update_result: BqUpdateResult = self.bigquery.update_table_desc(new_table_desc=table_desc)
         self.logger.info(f'{bq_update_result.type.value}. {bq_update_result.detail}')
@@ -107,8 +101,7 @@ class Controller:
             raise Exception(f"restore_dataset failed. type={bq_update_result.type} detail={bq_update_result.detail}")
 
     def _restore_dataset(self, dataset_id) -> BqUpdateResult:
-        self.logger.info(
-            f'Restore FireStore "{self.firestore.table_desc_col}:{dataset_id}" to BigQuery dataset "{dataset_id}"')
+        self.logger.info(f'Restore FireStore "{self.firestore.table_desc_col}:{dataset_id}" to BigQuery dataset "{dataset_id}"')
         dataset_desc: DatasetDesc = self.firestore.get_dataset_desc(dataset_id)
         bq_update_result = self.bigquery.update_dataset_desc(dataset_desc=dataset_desc)
         self.logger.info(f"{bq_update_result.type.value}. {bq_update_result.detail}")
@@ -116,7 +109,8 @@ class Controller:
 
     def restore_all(self) -> str:
         self.logger.info(
-            f"[RESTORE] Restore FireStore ({self.firestore.table_desc_col}) to BigQuery Table and FireStore ({self.firestore.dataset_desc_col}) to BigQuery Datasets")
+            f"[RESTORE] Restore FireStore ({self.firestore.table_desc_col}) to BigQuery Table and FireStore ({self.firestore.dataset_desc_col}) to BigQuery Datasets"
+        )
         result_type_counter = {"exception": 0}
         for _, result_type in ResultType.__members__.items():
             result_type_counter[result_type.value] = 0

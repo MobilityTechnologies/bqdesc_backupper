@@ -8,23 +8,18 @@ app_home = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__
 sys.path.append(os.path.join(app_home, "lib"))
 sys.path.append(os.path.join(app_home, "conf"))
 
-# load config
-from conf.config import Config
+from conf.config import Config  # noqa
+from lib.controller import Controller  # noqa
+from lib.firestore import Firestore  # noqa
+from lib.slack import Slack  # noqa
 
 config = Config()
 
-# load library
-from lib.controller import Controller
-from lib.firestore import Firestore
-from lib.slack import Slack
-
-# Logger setting
 log_format = logging.Formatter("%(asctime)s [%(levelname)8s] %(message)s")
 logger = logging.getLogger()
 log_level_mapper = {"info": logging.INFO, "warn": logging.WARNING, "error": logging.ERROR, "debug": logging.DEBUG}
 logger.setLevel(log_level_mapper[config.loglevel])
 
-# Output log to STDOUT
 stdout_handler = logging.StreamHandler(sys.stdout)
 stdout_handler.setFormatter(log_format)
 logger.addHandler(stdout_handler)
@@ -58,39 +53,39 @@ def snapshot(ctx):
     pass
 
 
-@backup.command(help="Backup specified table and fields description")
+@backup.command(name='table', help="Backup specified table and fields description")
 @click.option('--dataset', '-d', required=True)
 @click.option('--table', '-t', required=True)
-def table(table, dataset):
+def backup_table(table, dataset):
     controller.backup_table(table_id=table, dataset_id=dataset)
 
 
-@backup.command(help="Backup specified dataset description")
+@backup.command(name='dataset', help="Backup specified dataset description")
 @click.option('--dataset', '-d', required=True)
-def dataset(dataset):
+def backup_dataset(dataset):
     controller.backup_dataset(dataset_id=dataset)
 
 
-@backup.command(help="Backup all dataset and table(fields) descriptions in project")
-def all():
+@backup.command(name='all', help="Backup all dataset and table(fields) descriptions in project")
+def backup_all():
     controller.backup_all()
 
 
-@restore.command(help="Restore specified table and fields description")
+@restore.command(name='table', help="Restore specified table and fields description")
 @click.option('--dataset', '-d', required=True)
 @click.option('--table', '-t', required=True)
-def table(table, dataset):
+def restore_table(table, dataset):
     controller.restore_table(table_id=table, dataset_id=dataset)
 
 
-@restore.command(help="Restore specified dataset description")
+@restore.command(name='dataset', help="Restore specified dataset description")
 @click.option('--dataset', '-d', required=True)
-def dataset(dataset):
+def restore_dataset(dataset):
     controller.restore_dataset(dataset_id=dataset)
 
 
-@restore.command(help="Restore all dataset and table(fields) description")
-def all():
+@restore.command(name='all', help="Restore all dataset and table(fields) description")
+def restore_all():
     controller.restore_all()
 
 

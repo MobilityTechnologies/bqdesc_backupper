@@ -3,15 +3,15 @@ import unittest
 
 from init import config, logger, ignore_warnings
 
-from lib.dataset_desc import DatasetDesc
-from lib.firestore import Firestore
-from lib.table_desc import TableDesc
+from src.lib.dataset_desc import DatasetDesc
+from src.lib.firestore import Firestore
+from src.lib.table_desc import TableDesc
 
 TEST_DS = "test_bqdesc_buckuper"
 TEST_TABLE = "update_test"
 
-class TestFireStore(unittest.TestCase):
 
+class TestFireStore(unittest.TestCase):
     def setUp(self):
         self.db = Firestore(config, logger)
 
@@ -20,8 +20,18 @@ class TestFireStore(unittest.TestCase):
         rand_desc = "{0}".format(datetime.datetime.now())
         table_dict = {
             'description': rand_desc,
-            'schema': {'fields': [{'name': 'col1', 'type': 'STRING', 'description': rand_desc}]},
-            'tableReference': {'projectId': 'a', 'datasetId': TEST_DS, 'tableId': TEST_TABLE}
+            'schema': {
+                'fields': [{
+                    'name': 'col1',
+                    'type': 'STRING',
+                    'description': rand_desc
+                }]
+            },
+            'tableReference': {
+                'projectId': 'a',
+                'datasetId': TEST_DS,
+                'tableId': TEST_TABLE
+            }
         }
         table_desc = TableDesc(in_dict=table_dict)
         self.db.put_table_desc(TEST_DS, TEST_TABLE, table_desc)
@@ -31,8 +41,7 @@ class TestFireStore(unittest.TestCase):
     @ignore_warnings
     def test_dataset_put_get(self):
         rand_desc = "{0}".format(datetime.datetime.now())
-        dataset_desc = DatasetDesc(
-            in_dict={'description': rand_desc, 'datasetReference': {'projectId': 'a', 'datasetId': TEST_DS}})
+        dataset_desc = DatasetDesc(in_dict={'description': rand_desc, 'datasetReference': {'projectId': 'a', 'datasetId': TEST_DS}})
         self.db.put_dataset_desc(TEST_DS, dataset_desc)
         ret = self.db.get_dataset_desc(TEST_DS)
         self.assertEqual(rand_desc, ret.description)
