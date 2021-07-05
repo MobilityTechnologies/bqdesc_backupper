@@ -1,6 +1,6 @@
 import unittest
 
-from lib.table_desc import TableDesc
+from src.lib.table_desc import TableDesc
 
 
 class TestTableDesc(unittest.TestCase):

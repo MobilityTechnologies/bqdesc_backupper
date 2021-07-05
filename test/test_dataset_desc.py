@@ -1,6 +1,6 @@
 import unittest
 
-from lib.dataset_desc import DatasetDesc
+from src.lib.dataset_desc import DatasetDesc
 
 
 class TestDatasetDesc(unittest.TestCase):

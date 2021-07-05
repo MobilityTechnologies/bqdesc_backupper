@@ -24,3 +24,9 @@ run test
 ```
 python -m unittest discover test "test_*.py"
 ```
+
+run linter
+
+```
+tox -e lint
+```

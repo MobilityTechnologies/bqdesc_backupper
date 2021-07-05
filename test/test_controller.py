@@ -1,18 +1,19 @@
 import datetime
 import unittest
 
-from init import config, logger, ignore_warnings
+from .init import config, logger, ignore_warnings
 
-from lib.bigquery import Bigquery
-from lib.controller import Controller
-from lib.dataset_desc import DatasetDesc
-from lib.firestore import Firestore
-from lib.table_desc import TableDesc
+from src.lib.bigquery import Bigquery
+from src.lib.controller import Controller
+from src.lib.dataset_desc import DatasetDesc
+from src.lib.firestore import Firestore
+from src.lib.table_desc import TableDesc
 
 TEST_DS = "test_bqdesc_buckuper"
 TEST_TABLE = "update_test"
 TEST_COL1 = "col1"
 TEST_COL2 = "col2"
+
 
 class TestController(unittest.TestCase):
     def setUp(self):
@@ -20,15 +21,8 @@ class TestController(unittest.TestCase):
         self.bq = Bigquery(config=config, logger=logger)
         self.firestore = Firestore(config=config, logger=logger)
         self.project_id = config.gcp_project
-        self.table_reference = {
-            "projectId": self.project_id,
-            "datasetId": TEST_DS,
-            "tableId": TEST_TABLE
-        }
-        self.dataset_reference = {
-            "projectId": self.project_id,
-            "datasetId": TEST_DS
-        }
+        self.table_reference = {"projectId": self.project_id, "datasetId": TEST_DS, "tableId": TEST_TABLE}
+        self.dataset_reference = {"projectId": self.project_id, "datasetId": TEST_DS}
 
     @ignore_warnings
     def test_backup_table(self):
@@ -36,8 +30,17 @@ class TestController(unittest.TestCase):
         ymd_desc = "{0}".format(datetime.datetime.now())
         new_table_dict = {
             'description': ymd_desc,
-            "schema": {"fields": [{"name": TEST_COL1, "description": "a", "type": "STRING"},
-                                  {"name": TEST_COL2, "description": "a", "type": "STRING"}]},
+            "schema": {
+                "fields": [{
+                    "name": TEST_COL1,
+                    "description": "a",
+                    "type": "STRING"
+                }, {
+                    "name": TEST_COL2,
+                    "description": "a",
+                    "type": "STRING"
+                }]
+            },
             'tableReference': self.table_reference
         }
         table_desc = TableDesc(in_dict=new_table_dict)
@@ -53,8 +56,17 @@ class TestController(unittest.TestCase):
         ymd_desc = "{0}".format(datetime.datetime.now())
         new_table_dict = {
             'description': ymd_desc,
-            "schema": {"fields": [{"name": TEST_COL1, "description": "a", "type": "STRING"},
-                                  {"name": TEST_COL2, "description": "a", "type": "STRING"}]},
+            "schema": {
+                "fields": [{
+                    "name": TEST_COL1,
+                    "description": "a",
+                    "type": "STRING"
+                }, {
+                    "name": TEST_COL2,
+                    "description": "a",
+                    "type": "STRING"
+                }]
+            },
             'tableReference': self.table_reference
         }
         table_desc = TableDesc(in_dict=new_table_dict)

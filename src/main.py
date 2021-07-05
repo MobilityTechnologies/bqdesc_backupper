@@ -2,26 +2,22 @@ import logging
 import os
 import sys
 
+from google.cloud import logging as cloud_logging
+from google.cloud.logging.handlers import CloudLoggingHandler
+
 app_home = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(os.path.join(app_home, "lib"))
 sys.path.append(os.path.join(app_home, "conf"))
 
-# load config
-from conf.config import Config
+from conf.config import Config  # noqa
+from lib.controller import Controller  # noqa
+from lib.firestore import Firestore  # noqa
+from lib.slack import Slack  # noqa
 
-config = Config()
-
-# load library
-from lib.controller import Controller
-from lib.firestore import Firestore
-from lib.bigquery import BqUpdateResult
-from lib.slack import Slack
 
 RESPONSE_HEADERS = {'Access-Control-Allow-Origin': '*'}
 
-# Logger setting
-from google.cloud import logging as cloud_logging
-from google.cloud.logging.handlers import CloudLoggingHandler
+config = Config()
 
 client = cloud_logging.Client()
 handler = CloudLoggingHandler(client)
