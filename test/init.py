@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from src.conf.config_for_test import Config
+from src.conf.config_sample import Config
 
 import warnings
 from urllib3.exceptions import InsecureRequestWarning
