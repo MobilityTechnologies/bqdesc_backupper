@@ -1,7 +1,7 @@
-from lib.bigquery import Bigquery, BqUpdateResult, ResultType
-from lib.dataset_desc import DatasetDesc
-from lib.firestore import Firestore
-from lib.table_desc import TableDesc
+from src.lib.bigquery import Bigquery, BqUpdateResult, ResultType
+from src.lib.dataset_desc import DatasetDesc
+from src.lib.firestore import Firestore
+from src.lib.table_desc import TableDesc
 
 
 class Controller:

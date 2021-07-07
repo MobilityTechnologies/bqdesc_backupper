@@ -1,16 +1,16 @@
 class Config(object):
 
-    #----------------------
+    # ----------------------
     # Global
-    #----------------------
+    # ----------------------
 
     # Log Level
     #   valid choice : "info", "warn", "error", "debug"
     loglevel = "info"
 
-    #----------------------
+    # ----------------------
     # BigQuery
-    #----------------------
+    # ----------------------
 
     # GCP Project ID
     gcp_project = "your-gcp-project-id"
@@ -24,9 +24,9 @@ class Config(object):
     #   If gcp_use_key_json is True, this json file is used for authentication
     gcp_key_json = "/path/to/json"
 
-    #-----------------------
+    # -----------------------
     # FireStore
-    #-----------------------
+    # -----------------------
 
     # Collection to store dataset descriptions
     firesotre_dataset_desc_collection_name = 'bqdesc-backupper-dataset-desc'
@@ -34,14 +34,14 @@ class Config(object):
     # Collection to store table descriptions
     firestore_table_desc_collection_name = 'bqdesc-backupper-table-desc'
 
-    #------------------------
+    # ------------------------
     # Target Filter
-    #------------------------
+    # ------------------------
 
     # If dataset_id match this regexp, it is processed.
     #   Default r'.*'    (=match all)
     #
-    #dataset_include_pattern = r'^(dwh_|raw_)'
+    # dataset_include_pattern = r'^(dwh_|raw_)'
     dataset_include_pattern = r'.*'
 
     # If dataset_id match this regexp, it is skiped.
@@ -59,10 +59,9 @@ class Config(object):
     #
     table_exclude_pattern = r'^$'
 
-
-    #------------------------
+    # ------------------------
     # Slack Integration
-    #------------------------
+    # ------------------------
 
     # If True, send error messages to Slack channel.
     #
@@ -72,10 +71,9 @@ class Config(object):
     #   see https://slack.com/help/articles/115005265063
     slack_incomming_webhook_url = "https://hooks.slack.com/services/xxxxx"
 
-
-    #------------------------
+    # ------------------------
     # Costomize Error
-    #------------------------
+    # ------------------------
 
     # If True, Ignore error of DatasetNotFound when restore
     ignore_dataset_not_found_error_when_restore = False

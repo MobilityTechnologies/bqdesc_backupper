@@ -1,20 +1,22 @@
 import datetime
 import unittest
 
-from .init import config, logger, ignore_warnings
+import pytest
 
+from test.init import config, logger, ignore_warnings
 from src.lib.bigquery import Bigquery
 from src.lib.controller import Controller
 from src.lib.dataset_desc import DatasetDesc
 from src.lib.firestore import Firestore
 from src.lib.table_desc import TableDesc
 
-TEST_DS = "test_bqdesc_buckuper"
+TEST_DS = "test_bqdesc_backuper"
 TEST_TABLE = "update_test"
 TEST_COL1 = "col1"
 TEST_COL2 = "col2"
 
 
+@pytest.mark.gcp_project
 class TestController(unittest.TestCase):
     def setUp(self):
         self.controller = Controller(config=config, logger=logger)

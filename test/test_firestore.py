@@ -1,16 +1,18 @@
 import datetime
 import unittest
 
-from init import config, logger, ignore_warnings
+import pytest
 
+from test.init import config, logger, ignore_warnings
 from src.lib.dataset_desc import DatasetDesc
 from src.lib.firestore import Firestore
 from src.lib.table_desc import TableDesc
 
-TEST_DS = "test_bqdesc_buckuper"
+TEST_DS = "test_bqdesc_backuper"
 TEST_TABLE = "update_test"
 
 
+@pytest.mark.gcp_project
 class TestFireStore(unittest.TestCase):
     def setUp(self):
         self.db = Firestore(config, logger)
