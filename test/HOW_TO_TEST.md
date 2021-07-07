@@ -22,7 +22,7 @@ test/make_test_dataset_and_tables.sh
 run test
 
 ```
-python -m unittest discover test "test_*.py"
+tox -r py39
 ```
 
 run linter

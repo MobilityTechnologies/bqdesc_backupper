@@ -1,19 +1,21 @@
 import datetime
 import unittest
 
-from test.init import config, logger, ignore_warnings
+import pytest
 
+from test.init import config, logger, ignore_warnings
 from src.lib.bigquery import Bigquery, ResultType
 from src.lib.dataset_desc import DatasetDesc
 from src.lib.table_desc import TableDesc
 
 GCP_PROJECT_ID = config.gcp_project
-TEST_DS = "test_bqdesc_buckuper"
+TEST_DS = "test_bqdesc_backuper"
 TEST_TABLE = "update_test"
 TEST_COL1 = "col1"
 TEST_COL2 = "col2"
 
 
+@pytest.mark.gcp_project
 class TestBigquery(unittest.TestCase):
     def setUp(self):
         self.bq = Bigquery(config, logger)
@@ -298,7 +300,7 @@ class TestBigquery(unittest.TestCase):
         }
         table_desc = TableDesc(in_dict=new_table_dict)
         bq_update_result = self.bq.update_table_desc(table_desc)
-        self.assertEqual(ResultType.DATASET_NOT_FOUND, bq_update_result.type)
+        self.assertEqual(ResultType.TABLE_NOT_FOUND, bq_update_result.type)
 
     @ignore_warnings
     def test_update_table_not_exist_table(self):
@@ -363,6 +365,8 @@ class TestBigquery(unittest.TestCase):
     def test_update_dataset_desc_twice(self):
         ymd_str = "{0}".format(datetime.datetime.now())
         dataset_desc = DatasetDesc(in_dict={"description": ymd_str, "datasetReference": self.dataset_reference})
+        # update twice
+        _ = self.bq.update_dataset_desc(dataset_desc)
         update_result = self.bq.update_dataset_desc(dataset_desc)
         self.assertEqual(ResultType.SAME, update_result.type)
 

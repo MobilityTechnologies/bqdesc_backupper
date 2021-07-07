@@ -128,3 +128,7 @@ python src/cli.py snapshot list
 
 * [Integration with Slack](doc/SLACK.md)
 * [Integration with Google Cloud Functions](doc/CLOUD_FUNCTIONS.md)
+
+## For Developers
+
+see [how to test document](test/HOW_TO_TEST.md)
