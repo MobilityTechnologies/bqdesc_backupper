@@ -38,7 +38,7 @@ def dummy_projects():
 
 @pytest.mark.gcp_project
 class TestBigqueryGCP(unittest.TestCase):
-    def setUp(self, client_mock):
+    def setUp(self):
         self.bq = Bigquery(config, logger)
         self.table_reference = {"projectId": GCP_PROJECT_ID, "datasetId": TEST_DS, "tableId": TEST_TABLE}
         self.dataset_reference = {"projectId": GCP_PROJECT_ID, "datasetId": TEST_DS}
