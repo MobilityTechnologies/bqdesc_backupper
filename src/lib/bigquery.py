@@ -104,8 +104,9 @@ class Bigquery:
 
         except BadRequest as e:
             if e.errors[0]["message"].find("Invalid table ID") > -1:
-                is_success = self.config.ignore_table_not_found_error_when_restore
-                return BqUpdateResult(is_success, ResultType.TABLE_NOT_FOUND, detail=str(e))
+                if self.config.ignore_table_not_found_error_when_restore:
+                    return BqUpdateResult(True, ResultType.TABLE_NOT_FOUND, detail=str(e))
+                return BqUpdateResult(False, ResultType.TABLE_NOT_FOUND, detail=str(e))
             raise e
 
         is_same, diff_msg = new_table_desc.check_diff(existing_table_desc)
