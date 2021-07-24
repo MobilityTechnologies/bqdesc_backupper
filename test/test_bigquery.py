@@ -1,9 +1,11 @@
 import datetime
 import unittest
+from unittest import mock
 
+from google.api_core.exceptions import NotFound
 import pytest
 
-from test.init import config, logger, ignore_warnings
+from test.init import config, logger
 from src.lib.bigquery import Bigquery, ResultType
 from src.lib.dataset_desc import DatasetDesc
 from src.lib.table_desc import TableDesc
@@ -15,7 +17,25 @@ TEST_COL1 = "col1"
 TEST_COL2 = "col2"
 
 
-@pytest.mark.gcp_project
+# test helper functions
+def dummy_tables():
+    dummy_table1 = mock.MagicMock(table_id='dummy_table1')
+    dummy_table2 = mock.MagicMock(table_id='dummy_table2')
+    return [dummy_table1, dummy_table2]
+
+
+def dummy_datasets():
+    dummy_dataset1 = mock.MagicMock(dataset_id='dummy_dataset1')
+    dummy_dataset2 = mock.MagicMock(dataset_id='dummy_dataset2')
+    return [dummy_dataset1, dummy_dataset2]
+
+
+def dummy_projects():
+    dummy_project1 = mock.MagicMock(project_id='dummy_project1')
+    dummy_project2 = mock.MagicMock(project_id='dummy_project2')
+    return [dummy_project1, dummy_project2]
+
+
 class TestBigquery(unittest.TestCase):
     def setUp(self):
         self.bq = Bigquery(config, logger)
@@ -25,7 +45,7 @@ class TestBigquery(unittest.TestCase):
     # -----------------------
     # Table
     # -----------------------
-    @ignore_warnings
+    @pytest.mark.gcp_project
     def test_get_table__both_table_and_filed_have_desc(self):
         table_name = "both_table_and_filed_have_desc"
         table_desc: TableDesc = self.bq.get_table_desc(TEST_DS, table_name)
@@ -37,35 +57,35 @@ class TestBigquery(unittest.TestCase):
         self.assertEqual(TEST_DS, table_desc.dataset_id)
         self.assertEqual(GCP_PROJECT_ID, table_desc.project_id)
 
-    @ignore_warnings
+    @pytest.mark.gcp_project
     def test_get_table__col_only_have_desc(self):
         table_desc: TableDesc = self.bq.get_table_desc(TEST_DS, "col_only_have_desc")
         self.assertEqual("", table_desc.description)
         self.assertEqual(1, len(table_desc.field_list))
         self.assertEqual("this is col1 desc", table_desc.field_list[0].description)
 
-    @ignore_warnings
+    @pytest.mark.gcp_project
     def test_get_table__table_only_have_desc(self):
         table_desc: TableDesc = self.bq.get_table_desc(TEST_DS, "table_only_have_desc")
         self.assertEqual("this is table desc", table_desc.description)
         self.assertEqual(1, len(table_desc.field_list))
         self.assertEqual("", table_desc.field_list[0].description)
 
-    @ignore_warnings
+    @pytest.mark.gcp_project
     def test_get_table__neither_table_nor_filed_have_desc(self):
         table_desc: TableDesc = self.bq.get_table_desc(TEST_DS, "neither_table_nor_filed_have_desc")
         self.assertEqual("", table_desc.description)
         self.assertEqual(1, len(table_desc.field_list))
         self.assertEqual("", table_desc.field_list[0].description)
 
-    @ignore_warnings
+    @pytest.mark.gcp_project
     def test_get_table__part_of_cols_have_desc(self):
         table_desc: TableDesc = self.bq.get_table_desc(TEST_DS, "part_of_cols_have_desc")
         self.assertEqual(2, len(table_desc.field_list))
         self.assertEqual("this is col1 desc", table_desc.field_list[0].description)
         self.assertEqual("", table_desc.field_list[1].description)
 
-    @ignore_warnings
+    @pytest.mark.gcp_project
     def test_update_table_desc(self):
         """
              in     BQ     BQ
@@ -97,7 +117,7 @@ class TestBigquery(unittest.TestCase):
         self.assertEqual('new col1 description' + rand, ret_table_desc.field_list[0].description)
         self.assertEqual('new col2 description' + rand, ret_table_desc.field_list[1].description)
 
-    @ignore_warnings
+    @pytest.mark.gcp_project
     def test_update_table_desc__one_description_is_empty_string(self):
         """
              in     BQ     BQ
@@ -129,7 +149,7 @@ class TestBigquery(unittest.TestCase):
         self.assertEqual('new col1 description' + rand, ret_table_desc.field_list[0].description)
         self.assertEqual('', ret_table_desc.field_list[1].description)
 
-    @ignore_warnings
+    @pytest.mark.gcp_project
     def test_update_table_desc__filed_was_added(self):
         """
              in     BQ     BQ
@@ -160,7 +180,7 @@ class TestBigquery(unittest.TestCase):
         self.assertNotEqual('new col2 description' + rand, ret_table_desc.field_list[1].description)
 
     # field was removed
-    @ignore_warnings
+    @pytest.mark.gcp_project
     def test_update_table_desc__field_was_removed(self):
         """
              in     BQ     BQ
@@ -202,7 +222,7 @@ class TestBigquery(unittest.TestCase):
         self.assertEqual('new col1 description' + rand, ret_table_desc.field_list[0].description)
         self.assertEqual('new col2 description' + rand, ret_table_desc.field_list[1].description)
 
-    @ignore_warnings
+    @pytest.mark.gcp_project
     def test_update_table_desc__same(self):
         """
              in     BQ     BQ
@@ -214,7 +234,7 @@ class TestBigquery(unittest.TestCase):
         bq_update_result = self.bq.update_table_desc(ret1)
         self.assertEqual(ResultType.SAME, bq_update_result.type)
 
-    @ignore_warnings
+    @pytest.mark.gcp_project
     def test_update_table_desc__too_many_deletion_error(self):
         """
              in     BQ     BQ
@@ -245,7 +265,7 @@ class TestBigquery(unittest.TestCase):
         bq_update_result = self.bq.update_table_desc(table_desc)
         self.assertEqual(ResultType.TOO_MANY_DELETION, bq_update_result.type)
 
-    @ignore_warnings
+    @pytest.mark.gcp_project
     def test_update_table_desc__too_many_deletion_error_2(self):
         """
              in     BQ     BQ
@@ -273,7 +293,7 @@ class TestBigquery(unittest.TestCase):
         bq_update_result = self.bq.update_table_desc(table_desc)
         self.assertEqual(ResultType.TOO_MANY_DELETION, bq_update_result.type)
 
-    @ignore_warnings
+    @pytest.mark.gcp_project
     def test_update_table_desc__with_no_field_list(self):
         """
              in     BQ     BQ
@@ -286,8 +306,8 @@ class TestBigquery(unittest.TestCase):
         self.bq.update_table_desc(table_desc)
 
     # 存在しない
-    @ignore_warnings
-    def test_update_table_not_exist_dataset(self):
+    @mock.patch('src.lib.bigquery.Bigquery.get_table_desc', side_effect=NotFound("dataset not found"))
+    def test_update_table_not_exist_dataset(self, get_table_desc_mock):
         new_table_dict = {
             'schema': {
                 'fields': []
@@ -302,16 +322,16 @@ class TestBigquery(unittest.TestCase):
         bq_update_result = self.bq.update_table_desc(table_desc)
         self.assertEqual(ResultType.TABLE_NOT_FOUND, bq_update_result.type)
 
-    @ignore_warnings
-    def test_update_table_not_exist_table(self):
+    @mock.patch('src.lib.bigquery.Bigquery.get_table_desc', side_effect=NotFound("table not found"))
+    def test_update_table_not_exist_table(self, get_table_desc_mock):
         new_table_dict = {'schema': {'fields': []}, 'tableReference': {"projectId": GCP_PROJECT_ID, "datasetId": TEST_DS, "tableId": "does not exist table"}}
         table_desc = TableDesc(in_dict=new_table_dict)
         bq_update_result = self.bq.update_table_desc(table_desc)
         self.assertEqual(ResultType.TABLE_NOT_FOUND, bq_update_result.type)
         self.assertEqual(False, bq_update_result.is_success)
 
-    @ignore_warnings
-    def test_update_table_not_exist_dataset_with_ignore_table_not_found_error_when_restore(self):
+    @mock.patch('src.lib.bigquery.Bigquery.get_table_desc', side_effect=NotFound("table not found"))
+    def test_update_table_not_exist_dataset_with_ignore_table_not_found_error_when_restore(self, get_table_desc_mock):
         org_value = config.ignore_table_not_found_error_when_restore
         try:
             config.ignore_table_not_found_error_when_restore = True
@@ -334,26 +354,28 @@ class TestBigquery(unittest.TestCase):
         finally:
             config.ignore_table_not_found_error_when_restore = org_value
 
-    @ignore_warnings
-    def test_list_table_id(self):
+    @mock.patch('google.cloud.bigquery.Client.list_tables', return_value=dummy_tables())
+    def test_list_table_id(self, list_tables_mock):
         ret = self.bq.list_table_id(TEST_DS)
-        self.assertTrue(len(ret) > 0)
+        self.assertEqual('dummy_table1', ret[0])
+        self.assertEqual('dummy_table2', ret[1])
 
     # ----------------------------
     # Dataset
     # ----------------------------
 
-    @ignore_warnings
-    def test_list_dataset(self):
+    @mock.patch('google.cloud.bigquery.Client.list_datasets', return_value=dummy_datasets())
+    def test_list_dataset(self, list_datasets_mock):
         ret = self.bq.list_dataset_id()
-        self.assertTrue(len(ret) > 0)
+        self.assertEqual('dummy_dataset1', ret[0])
+        self.assertEqual('dummy_dataset2', ret[1])
 
-    @ignore_warnings
+    @pytest.mark.gcp_project
     def test_get_dataset_desc(self):
         dataset_desc: DatasetDesc = self.bq.get_dataset_desc(TEST_DS)
         self.assertEqual(TEST_DS, dataset_desc.dataset_id)
 
-    @ignore_warnings
+    @pytest.mark.gcp_project
     def test_update_dataset_desc(self):
         ymd_str = "{0}".format(datetime.datetime.now())
         dataset_desc = DatasetDesc(in_dict={"description": ymd_str, "datasetReference": self.dataset_reference})
@@ -361,7 +383,7 @@ class TestBigquery(unittest.TestCase):
         self.assertTrue(ResultType.UPDATE, update_result.type)
         self.assertEqual(ymd_str, self.bq.get_dataset_desc(TEST_DS).description)
 
-    @ignore_warnings
+    @pytest.mark.gcp_project
     def test_update_dataset_desc_twice(self):
         ymd_str = "{0}".format(datetime.datetime.now())
         dataset_desc = DatasetDesc(in_dict={"description": ymd_str, "datasetReference": self.dataset_reference})
@@ -370,8 +392,8 @@ class TestBigquery(unittest.TestCase):
         update_result = self.bq.update_dataset_desc(dataset_desc)
         self.assertEqual(ResultType.SAME, update_result.type)
 
-    @ignore_warnings
-    def test_update_dataset_not_exist_dataset(self):
+    @mock.patch('src.lib.bigquery.Bigquery.get_dataset_desc', side_effect=NotFound("dataset not found"))
+    def test_update_dataset_not_exist_dataset(self, get_dataset_desc_mock):
         ymd_str = "{0}".format(datetime.datetime.now())
         dataset_reference = {"projectId": GCP_PROJECT_ID, "datasetId": "does not exist dataset"}
         dataset_desc = DatasetDesc(in_dict={"description": ymd_str, "datasetReference": dataset_reference})
@@ -379,8 +401,8 @@ class TestBigquery(unittest.TestCase):
         self.assertEqual(ResultType.DATASET_NOT_FOUND, bq_update_result.type)
         self.assertEqual(False, bq_update_result.is_success)
 
-    @ignore_warnings
-    def test_update_dataset_not_exist_dataset_with_ignore_dataset_not_found_error_when_restore(self):
+    @mock.patch('src.lib.bigquery.Bigquery.get_dataset_desc', side_effect=NotFound("dataset not found"))
+    def test_update_dataset_not_exist_dataset_with_ignore_dataset_not_found_error_when_restore(self, get_dataset_desc_mock):
         org_value = config.ignore_dataset_not_found_error_when_restore
         try:
             config.ignore_dataset_not_found_error_when_restore = True
@@ -396,10 +418,11 @@ class TestBigquery(unittest.TestCase):
     # ----------------------------
     # Project
     # ----------------------------
-    @ignore_warnings
-    def test_list_project(self):
+    @mock.patch('google.cloud.bigquery.Client.list_projects', return_value=dummy_projects())
+    def test_list_project(self, list_projects_mock):
         ret = self.bq.list_project_id()
-        self.assertTrue(len(ret) > 0)
+        self.assertEqual('dummy_project1', ret[0])
+        self.assertEqual('dummy_project2', ret[1])
 
 
 if __name__ == '__main__':
