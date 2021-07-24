@@ -355,21 +355,21 @@ class TestBigqueryLocal(unittest.TestCase):
     def test_update_table_not_exist_dataset_with_ignore_table_not_found_error_when_restore(self):
         org_value = config.ignore_table_not_found_error_when_restore
         try:
-            config.ignore_table_not_found_error_when_restore = True
-            tmp_bq = Bigquery(config, logger)
+            with mock.patch('src.lib.bigquery.Bigquery.get_table_desc', side_effect=NotFound("table not found")), mock.patch('google.cloud.bigquery.Client'):
+                config.ignore_table_not_found_error_when_restore = True
+                tmp_bq = Bigquery(config, logger)
 
-            new_table_dict = {
-                'schema': {
-                    'fields': []
-                },
-                'tableReference': {
-                    "projectId": GCP_PROJECT_ID,
-                    "datasetId": TEST_DS,
-                    "tableId": "does not exist table"
+                new_table_dict = {
+                    'schema': {
+                        'fields': []
+                    },
+                    'tableReference': {
+                        "projectId": GCP_PROJECT_ID,
+                        "datasetId": TEST_DS,
+                        "tableId": "does not exist table"
+                    }
                 }
-            }
-            table_desc = TableDesc(in_dict=new_table_dict)
-            with mock.patch('src.lib.bigquery.Bigquery.get_table_desc', side_effect=NotFound("table not found")):
+                table_desc = TableDesc(in_dict=new_table_dict)
                 bq_update_result = tmp_bq.update_table_desc(table_desc)
                 self.assertEqual(ResultType.TABLE_NOT_FOUND, bq_update_result.type)
                 self.assertEqual(True, bq_update_result.is_success)
