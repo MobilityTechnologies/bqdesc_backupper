@@ -131,8 +131,10 @@ class Bigquery:
         self.client.update_table(new_table, ["description", "schema"])
 
     def list_table_id(self, dataset_id, include_pattern=MATCH_ALL, exclude_pattern=MATCH_NONE):
-        tables = list(self.client.list_tables(f'{self.project}.{dataset_id}'))
-        return [table.table_id for table in tables if _filter_by_patterns(table.table_id, include_pattern, exclude_pattern)]
+        return [
+            table.table_id for table in self.client.list_tables(f'{self.project}.{dataset_id}')
+            if _filter_by_patterns(table.table_id, include_pattern, exclude_pattern)
+        ]
 
 
 def _filter_by_patterns(target, include_pattern, exclude_pattern) -> bool:
